@@ -66,17 +66,3 @@ program fdtd
 
 
 end program fdtd
-
-! function filename(n) result(name)
-!     character(len=20) :: name
-!     character(len=20) :: n2str
-!     integer :: n
-!     write (n2str,'(I4.4)') n
-!     name = 'frame'//trim(n2str)//'.csv'
-! end function filename
-
-! function filename(n) result(name)
-!     character(len=20) :: name
-!     integer :: n
-!     write (name,'("frame"I4.4".csv")') n
-! end function filename
