@@ -5,7 +5,8 @@ program fdtd
     real, dimension(length) :: epsilon_r, mu_r, mE, mH, Ey, Hx
     real :: dz=1
     integer :: k, step, steps_per_frame=10, frame, number_of_frames=4
-    character(len=20) :: filename, format_string='(E16.9)'
+    character(len=20) :: filename1, filename2, format_string='(E16.9)'
+    
     ! Initialize materials to free space
     ! Initialize fields to zero
     do k=1, length
@@ -29,30 +30,23 @@ program fdtd
     ! Main FDTD loop
     do frame = 1, number_of_frames
         
-        ! write (filename,*) frame
-        print *, ''
-        write (filename,'("frame"I4.4".csv")') frame
-        print *, filename
-        
-        print *, ''
-
+        write (filename1,'("./output/Hx"I4.4".csv")') frame
+        open(1, file=filename1, status='replace')
         do k = 1, length-1
-            write(*,format_string,advance='NO') Hx(k)
-            write(*,'(A)',advance='NO') ','
+            write(1,format_string,advance='NO') Hx(k)
+            write(1,'(A)',advance='NO') ','
         end do
-        write(*,format_string,advance='NO') Hx(1)
-        
-        print *, ''
-        print *, ''
+        write(1,format_string,advance='NO') Hx(1)
+        close(1)
 
-        write(*,format_string,advance='NO') Ey(1)
+        write (filename2,'("./output/Ey"I4.4".csv")') frame
+        open(2, file=filename2, status='replace')
+        write(2,format_string,advance='NO') Ey(1)
         do k = 2, length
-            write(*,'(A)',advance='NO') ','
-            write(*,format_string,advance='NO') Ey(k)
+            write(2,'(A)',advance='NO') ','
+            write(2,format_string,advance='NO') Ey(k)
         end do
-
-        print *, ''
-        print *, ''
+        close(2)
 
         do step = 1, steps_per_frame
             
