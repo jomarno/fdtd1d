@@ -1,11 +1,12 @@
 program fdtd
     implicit none
-    integer, parameter :: length=240, number_of_frames=60, steps_per_frame=6
+    integer, parameter :: length=240, number_of_frames=60, steps_per_frame=12
     integer :: k, frame, step
     real, dimension(length) :: epsilon_r, mu_r, mE, mH, Ey, Hx
-    real :: dz=1
+    real, dimension(number_of_frames*steps_per_frame) :: source
+    real :: dz=1, dt=1
     character(len=20) :: filename, format_string
-    
+
     do k=1, length
         ! Initialize materials to free space
         epsilon_r(k)=1
@@ -16,8 +17,11 @@ program fdtd
         Ey(k)=0
     end do
 
-    Hx(60)=1
-    
+    ! Generate source
+    do step=1, number_of_frames*steps_per_frame
+        source(step)= exp(-((step*dt-40)/10)**2)
+    end do
+
 
     ! Compute update coefficients
     mE = 0.5/epsilon_r
@@ -68,6 +72,10 @@ program fdtd
             do k = 2, length
                 Ey(k) = Ey(k) + mE(k)*(Hx(k)-Hx(k-1))/dz
             end do
+
+            ! Inject source
+            Ey(60) = Ey(60) + source(step + (frame-1)*steps_per_frame)
+
         end do
 
     end do
