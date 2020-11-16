@@ -19,11 +19,11 @@ files = glob.glob('output/Hx*')
 for filename in files:
     Hx = np.genfromtxt(filename, delimiter=',')
     Ey = np.genfromtxt('output/Ey' + filename[-8:], delimiter=',')
-        
-    plt.plot(Hx)
-    plt.plot(Ey)
-    plt.ylim(-1,1)
-    # plt.autoscale(enable=True, axis='x', tight=True)
+    
+    plt.plot(Hx,'b')
+    plt.plot(Ey,'r')
+    plt.ylim(-1.1,1.1)
+    plt.autoscale(enable=True, axis='x', tight=True)
     # plt.grid(b=True,which='major')
     # plt.minorticks_on()
     # plt.grid(b=True,which='minor',alpha=0.5)
@@ -33,3 +33,5 @@ for filename in files:
     
     i+=1
     print('Rendered frame' + filename[-8:-4] + '\t', i, '/', len(files))
+
+plt.ion()

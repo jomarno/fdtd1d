@@ -1,11 +1,15 @@
 program fdtd
     implicit none
-    integer, parameter :: length=240, number_of_frames=60, steps_per_frame=12
+    integer, parameter :: length=120, number_of_frames=90, steps_per_frame=3
     integer :: k, frame, step
+    real, parameter :: c0=1, dz=1
     real, dimension(length) :: epsilon_r, mu_r, mE, mH, Ey, Hx
     real, dimension(number_of_frames*steps_per_frame) :: source
-    real :: dz=1, dt=1
+    real :: dt, h1, h2, h3, e1, e2, e3
     character(len=20) :: filename, format_string
+
+    ! Compute time step
+    dt = 0.5*dz/c0
 
     do k=1, length
         ! Initialize materials to free space
@@ -17,15 +21,19 @@ program fdtd
         Ey(k)=0
     end do
 
+    ! Initialize boundary terms to zero
+    h1=0;h2=0;h3=0
+    e1=0;e2=0;e3=0
+
     ! Generate source
     do step=1, number_of_frames*steps_per_frame
-        source(step)= exp(-((step*dt-40)/10)**2)
+        source(step)= exp(-((step*dt-24)/6)**2)
     end do
 
 
     ! Compute update coefficients
-    mE = 0.5/epsilon_r
-    mH = 0.5/mu_r
+    mE = 0.5*dz/epsilon_r
+    mH = 0.5*dz/mu_r
     
     ! dt = n*dz/(2*c0)
     ! n := refractive index at boundries
@@ -65,17 +73,18 @@ program fdtd
             do k = 1, length-1
                 Hx(k) = Hx(k) + mH(k)*(Ey(k+1)-Ey(k))/dz
             end do
-            Hx(length) = Hx(length) - mH(length)*Ey(length)/dz
+            Hx(length) = Hx(length) + mH(length)*(e3 - Ey(length))/dz
+            h3=h2; h2=h1; h1=Hx(1)
 
             ! Update Ey
-            Ey(1) = Ey(1) + mE(1)*Hx(1)/dz
+            Ey(1) = Ey(1) + mE(1)*(Hx(1) - h3)/dz
             do k = 2, length
                 Ey(k) = Ey(k) + mE(k)*(Hx(k)-Hx(k-1))/dz
             end do
+            e3=e2; e2=e1; e1=Ey(length)
 
             ! Inject source
-            Ey(60) = Ey(60) + source(step + (frame-1)*steps_per_frame)
-
+            Ey(40) = Ey(40) + source(step + (frame-1)*steps_per_frame)
         end do
 
     end do
