@@ -1,10 +1,10 @@
 program fdtd
     implicit none
-    integer, parameter :: length=120, number_of_frames=90, steps_per_frame=3
+    integer, parameter :: length=120, number_of_frames=96, steps_per_frame=3
     integer :: k, frame, step
-    real, parameter :: c0=1, dz=1
+    real, parameter :: c0=1, dz=1, tau=6, t0=24
     real, dimension(length) :: epsilon_r, mu_r, mE, mH, Ey, Hx
-    real, dimension(number_of_frames*steps_per_frame) :: source
+    real, dimension(number_of_frames*steps_per_frame) :: Esource, Hsource
     real :: dt, h1, h2, h3, e1, e2, e3
     character(len=20) :: filename, format_string
 
@@ -21,13 +21,19 @@ program fdtd
         Ey(k)=0
     end do
 
+    ! do k=2*length/3, 3*length/4
+    !     epsilon_r(k)=2.4
+    !     mu_r(k)=2.4
+    ! end do
+
     ! Initialize boundary terms to zero
     h1=0;h2=0;h3=0
     e1=0;e2=0;e3=0
 
     ! Generate source
     do step=1, number_of_frames*steps_per_frame
-        source(step)= exp(-((step*dt-24)/6)**2)
+        Esource(step)= exp(-((step*dt-t0)/tau)**2)
+        Hsource(step)= -exp(-((step*dt+1.5*dt-t0)/tau)**2)
     end do
 
 
@@ -76,6 +82,9 @@ program fdtd
             Hx(length) = Hx(length) + mH(length)*(e3 - Ey(length))/dz
             h3=h2; h2=h1; h1=Hx(1)
 
+            ! Inject H source
+            Hx(8) = Hx(8) - mH(8)*Esource(step+(frame-1)*steps_per_frame)/dz
+
             ! Update Ey
             Ey(1) = Ey(1) + mE(1)*(Hx(1) - h3)/dz
             do k = 2, length
@@ -83,8 +92,11 @@ program fdtd
             end do
             e3=e2; e2=e1; e1=Ey(length)
 
-            ! Inject source
-            Ey(40) = Ey(40) + source(step + (frame-1)*steps_per_frame)
+            ! Inject E source
+            Ey(9) = Ey(9) - mE(9)*Hsource(step+(frame-1)*steps_per_frame)/dz
+
+            ! ! Inject source
+            ! Ey(30) = Ey(30) + Esource(step + (frame-1)*steps_per_frame)
         end do
 
     end do
