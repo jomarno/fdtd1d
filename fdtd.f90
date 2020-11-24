@@ -1,9 +1,9 @@
 program fdtd
     implicit none
-    integer :: length, number_of_frames, steps_per_frame
-    integer :: k, frame, step
-    real :: c0, dz, tau, t0
-    real :: dt, h1, h2, h3, e1, e2, e3
+    integer :: length, number_of_frames, steps_per_frame ! Read from file
+    integer :: k, frame, step, total_steps
+    real :: c0, dz, tau, t0 ! Read from file
+    real :: dt, n, h1, h2, h3, e1, e2, e3
     real, allocatable, dimension(:) :: epsilon_r, mu_r, mE, mH, Ey, Hx
     real, allocatable, dimension(:) :: sourceEy, sourceHx
     character(len=20) :: filename, format_string
@@ -13,25 +13,19 @@ program fdtd
     read(1,*) length, number_of_frames, steps_per_frame, c0, dz, tau, t0
     close(1)
 
-    allocate(epsilon_r(length), mu_r(length), mE(length), mH(length))
-
+    ! Read material properties from CSV files
+    allocate(epsilon_r(length), mu_r(length))
     open(1, file='./materials/mu_r.csv', status='old')
-    read(1,*) mu_r
-    close(1)
     open(2, file='./materials/epsilon_r.csv', status='old')
-    read(2,*) epsilon_r
-    close(2)
+    read(1,*) mu_r ! Relative magnetic permeability
+    read(2,*) epsilon_r ! Relative electric permitivity
+    close(1); close(2)
 
     ! Compute update coefficients
-    mE = 0.5*sqrt(epsilon_r(1)*mu_r(1))*dz/epsilon_r
-    mH = 0.5*sqrt(epsilon_r(1)*mu_r(1))*dz/mu_r
-    ! dt = n*dz/(2*c0)
-    ! n := refractive index at boundries
-    ! mE = c0*dt/epsilon_r = n*dz/(2*epsilon_r)
-    ! mH = c0*dt/mu_r = n*dz/(2*mu_r)
-
-    ! Compute time step
-    dt = 0.5*sqrt(epsilon_r(1)*mu_r(1))*dz/c0
+    allocate(mE(length), mH(length))
+    n = sqrt(epsilon_r(1)*mu_r(1))
+    mE = 0.5*n*dz/epsilon_r
+    mH = 0.5*n*dz/mu_r
 
     deallocate(epsilon_r, mu_r)
 
@@ -46,10 +40,12 @@ program fdtd
     h1=0;h2=0;h3=0
     e1=0;e2=0;e3=0
 
-    ! Generate source
-    allocate(sourceEy(number_of_frames*steps_per_frame))
-    allocate(sourceHx(number_of_frames*steps_per_frame))
-    do step=1, number_of_frames*steps_per_frame
+    ! Generate gaussian source
+    dt = 0.5*n*dz/c0
+    total_steps = number_of_frames*steps_per_frame
+    allocate(sourceEy(total_steps))
+    allocate(sourceHx(total_steps))
+    do step=1, total_steps
         sourceEy(step)= exp(-((step*dt-t0)/tau)**2)
         sourceHx(step)= -exp(-(((step+1.5)*dt-t0)/tau)**2)
     end do
@@ -108,4 +104,6 @@ program fdtd
 
     end do
 
+
 end program fdtd
+
