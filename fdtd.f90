@@ -1,12 +1,21 @@
 program fdtd
     implicit none
-    integer, parameter :: length=120, number_of_frames=96, steps_per_frame=3
+    integer :: length, number_of_frames, steps_per_frame
     integer :: k, frame, step
-    real, parameter :: c0=1, dz=1, tau=6, t0=18
-    real, dimension(length) :: epsilon_r, mu_r, mE, mH, Ey, Hx
-    real, dimension(number_of_frames*steps_per_frame) :: sourceEy, sourceHx
+    real :: c0, dz, tau, t0
+    real, allocatable, dimension(:) :: epsilon_r, mu_r, mE, mH, Ey, Hx
+    real, allocatable, dimension(:) :: sourceEy, sourceHx
     real :: dt, h1, h2, h3, e1, e2, e3
     character(len=20) :: filename, format_string
+
+    open(1, file='parameters.csv', status='old')
+    read(1,*) length, number_of_frames, steps_per_frame, c0, dz, tau, t0
+    close(1)
+
+    allocate(epsilon_r(length), mu_r(length))
+    allocate(mE(length), mH(length), Ey(length), Hx(length))
+    allocate(sourceEy(number_of_frames*steps_per_frame))
+    allocate(sourceHx(number_of_frames*steps_per_frame))
 
     ! Compute time step
     dt = 0.5*dz/c0
