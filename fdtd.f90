@@ -1,16 +1,17 @@
 program fdtd
     implicit none
-    integer :: length, number_of_frames, steps_per_frame ! Read from file
+    integer :: length, number_of_frames, steps_per_frame, ks ! Read from file
     integer :: k, frame, step, total_steps
     real :: c0, dz, tau, t0 ! Read from file
     real :: dt, n, h1, h2, h3, e1, e2, e3
-    real, allocatable, dimension(:) :: epsilon_r, mu_r, mE, mH, Ey, Hx
-    real, allocatable, dimension(:) :: sourceEy, sourceHx
+    real, allocatable, dimension(:) :: epsilon_r, mu_r ! Read form file
+    real, allocatable, dimension(:) :: mE, mH, Ey, Hx ! dim = length
+    real, allocatable, dimension(:) :: sourceEy, sourceHx ! dim = total_steps
     character(len=20) :: filename, format_string
 
     ! Read parameters from CSV file
     open(1, file='parameters.csv', status='old')
-    read(1,*) length, number_of_frames, steps_per_frame, c0, dz, tau, t0
+    read(1,*) length, number_of_frames, steps_per_frame, ks, c0, dz, tau, t0
     close(1)
 
     ! Read material properties from CSV files
@@ -65,7 +66,7 @@ program fdtd
             end do
             Hx(length) = Hx(length) + mH(length)*(e3 - Ey(length))/dz
             ! Inject one-way source
-            Hx(8) = Hx(8) - mH(8)*sourceEy(step+(frame-1)*steps_per_frame)/dz
+            Hx(ks-1) = Hx(ks-1) - mH(ks-1)*sourceEy(step+(frame-1)*steps_per_frame)/dz
             ! Handle boundary
             h3=h2; h2=h1; h1=Hx(1)
 
@@ -76,7 +77,7 @@ program fdtd
                 Ey(k) = Ey(k) + mE(k)*(Hx(k)-Hx(k-1))/dz
             end do
             ! Inject one-way source
-            Ey(9) = Ey(9) - mE(9)*sourceHx(step+(frame-1)*steps_per_frame)/dz
+            Ey(ks) = Ey(ks) - mE(ks)*sourceHx(step+(frame-1)*steps_per_frame)/dz
             ! Handle boundary
             e3=e2; e2=e1; e1=Ey(length)
 
