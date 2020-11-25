@@ -22,34 +22,31 @@ plt.ioff()
 length, number_of_frames, steps_per_frame, ks, \
     c0, dz, tau, t0 = read_parameters()
 
-k = np.arange(length)+1
+zH = (np.arange(length) + 0.5)*dz
+zE = np.arange(length)*dz
+
 i = 0
+
 fig, ax = plt.subplots()
+ax.set_ylim(-1.1, 1.1)
+ax.set_xlim(0, length)
+# plt.minorticks_on()
+# plt.grid(True, alpha=0.5, linewidth=0.8)
+# plt.grid(True, 'minor', alpha=0.2, linewidth=0.6)
+ax.axvline((ks-1)*dz, color='k', linestyle=':')
+
 files = glob.glob('output/Hx*')
 for filename in files:
     Hx = np.genfromtxt(filename, delimiter=',')
     Ey = np.genfromtxt('output/Ey' + filename[-8:], delimiter=',')
     
-    ax.axvline(ks, color='k', linestyle=':')
-    ax.plot(k,Hx,'b')
-    ax.plot(k,Ey,'r')
-    ax.set_ylim(-1.1,1.1)
-    ax.set_xlim(0,length)
+    line1 = ax.plot(zH, Hx, 'b')
+    line2 = ax.plot(zE, Ey, 'r')
     # plt.autoscale(enable=True, axis='x', tight=True)
     plt.title(filename[-8:-4])
     plt.savefig('frames/frame' + filename[-8:-4] + '.png')
-    plt.cla()
-    
-    # plt.plot(Hx,'b')
-    # plt.plot(Ey,'r')
-    # plt.ylim(-1.1,1.1)
-    # plt.autoscale(enable=True, axis='x', tight=True)
-    # # plt.grid(b=True,which='major')
-    # # plt.minorticks_on()
-    # # plt.grid(b=True,which='minor',alpha=0.5)
-    # plt.title(filename[-8:-4])
-    # plt.savefig('frames/frame' + filename[-8:-4] + '.png')
-    # plt.close('all')
+    l1 = line1.pop(0); l1.remove(); del l1
+    l2 = line2.pop(0); l2.remove(); del l2
     
     i+=1
     print('Rendered frame' + filename[-8:-4] + '\t', i, '/', len(files))
