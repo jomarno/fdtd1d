@@ -28,12 +28,21 @@ zE = np.arange(length)*dz
 i = 0
 
 fig, ax = plt.subplots()
-ax.set_ylim(-1.1, 1.1)
+ax.set_ylim(-1.5, 1.5)
 ax.set_xlim(0, length)
 # plt.minorticks_on()
 # plt.grid(True, alpha=0.5, linewidth=0.8)
 # plt.grid(True, 'minor', alpha=0.2, linewidth=0.6)
 ax.axvline((ks-1)*dz, color='k', linestyle=':')
+
+# ax.axvline(60*dz, color='darkgrey')
+# ax.axvline(80*dz, color='darkgrey')
+
+fig.patch.set_facecolor('darkgrey')
+# ax.patch.set_facecolor('lightgrey')
+ax.axvspan(0, 60, facecolor='lightgrey')
+ax.axvspan(60, 80, facecolor='silver')
+ax.axvspan(80, 120, facecolor='lightgrey')
 
 files = glob.glob('output/Hx*')
 for filename in files:
