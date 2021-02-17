@@ -1,4 +1,4 @@
-program fdtd
+program fdtd1d
     implicit none
     integer :: length, number_of_frames, steps_per_frame, ks ! Read from file
     integer :: k, frame, step, total_steps
@@ -106,5 +106,5 @@ program fdtd
     end do
 
 
-end program fdtd
+end program fdtd1d
 
