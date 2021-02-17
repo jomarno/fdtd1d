@@ -75,9 +75,8 @@ for i in range(len(greyvalues)):
 # MAIN LOOP TO DRAW THE DIFFERENT FRAMES
 
 # Get list with the names of all .csv files with H-field data
-filenames = glob.glob('output/Hx*')
+filenames = sorted(glob.glob('output/Hx*'))
 
-i = 0
 for filename in filenames:
     
     # For each H-field file, read it and the corresponding E-field
@@ -99,6 +98,5 @@ for filename in filenames:
     l2 = line2.pop(0); l2.remove(); del l2
     
     # Show progress
-    i+=1
-    print('Rendered frame'+filename[-8:-4]+'\t', i, '/', len(filenames))
+    print('Rendered frame'+filename[-8:-4])
 

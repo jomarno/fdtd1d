@@ -85,7 +85,7 @@ program fdtd
 
 
         ! Generate filename with frame number
-        write (filename,'(I4.4".csv")') frame
+        write (filename,'(I4.4,".csv")') frame
 
         ! Write Hx to a CSV file
         open(1, file='./output/Hx'//filename, status='replace')
