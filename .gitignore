@@ -1,6 +1,8 @@
 fdtd1d
 parameters.csv
+generate_materials.py
 output/
 frames/
 materials/
 video/
+__pycache__/
