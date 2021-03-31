@@ -1,6 +1,7 @@
 fdtd1d
 parameters.csv
 generate_materials.py
+generate_parameters.py
 output/
 frames/
 materials/
