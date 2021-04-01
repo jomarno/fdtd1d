@@ -11,12 +11,19 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import colors as mcolors
 
+class Parameters:
+    def read(self, file):
+        parameters = np.genfromtxt(file, delimiter=',')
+        parameters = [int(i) for i in parameters]
 
-def read_parameters():
-    parameters = list(np.genfromtxt('parameters.csv', delimiter=','))
-    for i in range(4):
-        parameters[i] = int(parameters[i])
-    return parameters
+        self.length, self.number_of_frames, self.steps_per_frame, \
+        self.ks, self.c0, self.dz, self.tau, self.t0 = parameters
+    
+    def write(self, file):
+        parameters = [self.length, self.number_of_frames, self.steps_per_frame, \
+        self.ks, self.c0, self.dz, self.tau, self.t0]
+
+        np.savetxt(file, [parameters], delimiter=',',fmt='%g')
 
 
 def draw_figure(length, ks, dz, n):
@@ -52,11 +59,14 @@ def draw_figure(length, ks, dz, n):
     return ax
 
 
-def main():
-    
+if __name__ == "__main__":
+
     # Read simulation parameters from .csv file
-    length, number_of_frames, steps_per_frame, ks, \
-        c0, dz, tau, t0 = read_parameters()
+    parameters = Parameters()
+    parameters.read('parameters.csv')
+
+    # length, number_of_frames, steps_per_frame, ks, \
+    #     c0, dz, tau, t0 = read_parameters()
 
     # Read material properties to draw background
     epsilon_r = np.genfromtxt('./materials/epsilon_r.csv', delimiter=',')
@@ -64,8 +74,8 @@ def main():
     n = np.sqrt(epsilon_r*mu_r) # Calculate refractive index
 
     # Generate z-coordinates corresponding to H- and E-fields
-    zH = (np.arange(length) + 0.5)*dz
-    zE = np.arange(length)*dz
+    zH = (np.arange(parameters.length) + 0.5)*parameters.dz
+    zE = np.arange(parameters.length)*parameters.dz
 
 
     # DRAW FRAMES
@@ -74,7 +84,7 @@ def main():
     plt.ioff() # Turn off interactive mode for increased speed
     
     # Draw figure and axes before loop
-    ax = draw_figure(length, ks, dz, n)
+    ax = draw_figure(parameters.length, parameters.ks, parameters.dz, n)
 
     # Get list of all .csv files with H-field data
     filenames = sorted(glob.glob('output/Hx*'))
@@ -101,7 +111,3 @@ def main():
         
         # Show progress
         print('Rendered frame'+filename[-8:-4])
-
-
-# If renderframes.py is the main program, run the main() function
-if __name__ == "__main__": main()
