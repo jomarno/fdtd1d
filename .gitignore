@@ -1,6 +1,9 @@
 fdtd1d
 parameters.csv
-output/
-frames/
-materials/
+output/*
+!output/.gitkeep
+frames/*
+!frames/.gitkeep
+materials/*
+!materials/.gitkeep
 __pycache__/
