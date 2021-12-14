@@ -87,26 +87,26 @@ np.savetxt('./materials/mu_r.csv', [mu_r], delimiter=',',fmt='%g')
 
 
 
-# PLOTS OF MATERIAL PROPERTIES AND FIGURE PREVIEW
+# # PLOTS OF MATERIAL PROPERTIES AND FIGURE PREVIEW
 
-# Calculate refractive index
-n = np.sqrt(epsilon_r*mu_r)
+# # Calculate refractive index
+# n = np.sqrt(epsilon_r*mu_r)
 
-from matplotlib import pyplot as plt
-from renderframes import draw_figure
+# from matplotlib import pyplot as plt
+# from renderframes import draw_figure
 
-plt.close('all')
+# plt.close('all')
 
-# Material properties
-plt.figure()
-plt.plot(mu_r)
-plt.plot(epsilon_r)
-plt.plot(n)
-plt.minorticks_on()
-plt.grid(True, alpha=0.5, linewidth=0.8)
-plt.grid(True, 'minor', alpha=0.2, linewidth=0.6)
+# # Material properties
+# plt.figure()
+# plt.plot(mu_r)
+# plt.plot(epsilon_r)
+# plt.plot(n)
+# plt.minorticks_on()
+# plt.grid(True, alpha=0.5, linewidth=0.8)
+# plt.grid(True, 'minor', alpha=0.2, linewidth=0.6)
 
-# Figure preview
-draw_figure(parameters.length, parameters.ks, parameters.dz, n)
+# # Figure preview
+# draw_figure(parameters.length, parameters.ks, parameters.dz, n)
 
 
